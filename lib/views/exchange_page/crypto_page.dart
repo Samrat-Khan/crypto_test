@@ -21,47 +21,50 @@ class CryptoPage extends StatelessWidget {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const HighlightedCard(),
-                    ListTile(
-                      title: Text(
-                        'Top Cryptocurrency',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w800,
+              : RefreshIndicator(
+                  onRefresh: () async => await controller.getTopCurrency(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const HighlightedCard(),
+                      ListTile(
+                        title: Text(
+                          'Top Cryptocurrency',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        trailing: Text(
+                          'View All',
+                          style: GoogleFonts.poppins(),
                         ),
                       ),
-                      trailing: Text(
-                        'View All',
-                        style: GoogleFonts.poppins(),
+                      Expanded(
+                        child: controller.topCurrency == null
+                            ? const Text("No Data")
+                            : ListView.separated(
+                                itemCount: controller.searchDataList.isNotEmpty
+                                    ? controller.searchDataList.length
+                                    : controller.filterDataList.isNotEmpty
+                                        ? controller.filterDataList.length
+                                        : controller.topCurrency!.data!.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 10),
+                                itemBuilder: (context, index) {
+                                  return CommonCryptoTile(
+                                    cryptoData: controller
+                                            .searchDataList.isNotEmpty
+                                        ? controller.searchDataList[index]
+                                        : controller.filterDataList.isNotEmpty
+                                            ? controller.filterDataList[index]
+                                            : controller
+                                                .topCurrency!.data![index],
+                                  );
+                                },
+                              ),
                       ),
-                    ),
-                    Expanded(
-                      child: controller.topCurrency == null
-                          ? const Text("No Data")
-                          : ListView.separated(
-                              itemCount: controller.searchDataList.isNotEmpty
-                                  ? controller.searchDataList.length
-                                  : controller.filterDataList.isNotEmpty
-                                      ? controller.filterDataList.length
-                                      : controller.topCurrency!.data!.length,
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 10),
-                              itemBuilder: (context, index) {
-                                return CommonCryptoTile(
-                                  cryptoData:
-                                      controller.searchDataList.isNotEmpty
-                                          ? controller.searchDataList[index]
-                                          : controller.filterDataList.isNotEmpty
-                                              ? controller.filterDataList[index]
-                                              : controller
-                                                  .topCurrency!.data![index],
-                                );
-                              },
-                            ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
         },
       ),
